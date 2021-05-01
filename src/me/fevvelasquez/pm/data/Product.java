@@ -19,10 +19,21 @@ import java.math.BigDecimal;
 import static java.math.RoundingMode.*;
 
 /**
- * @version 0.4.2
+ * {@code Product} class represents properties and behaviors of Product objects,
+ * in the Product Management System. <br>
+ * Each Product has an id, name and price. <br>
+ * Each product can have a discount, calculated based on {@link DISCOUNT_RATE}
+ * discount rate.
+ * 
+ * @version 0.4.3
  * @author oracle GNU GPL / fevvelasquez
  */
 public class Product {
+	/**
+	 * A constant that defines a {@link java.math.BigDecimal BigDecimal} of the
+	 * discount rate value.<br>
+	 * Discount rate of 0.10 is equivalent to 10%.
+	 */
 	public static final BigDecimal DISCOUNT_RATE = new BigDecimal(String.valueOf("0.10"));
 
 	private int id;
@@ -72,10 +83,12 @@ public class Product {
 	}
 
 	/**
-	 * @return discount <br>
-	 *         The discount value by applying the discount rate to product
-	 *         price.<br>
-	 *         Rounding mode HALF_EVEN with scale of 2 applied.
+	 * Calculates discount based on product price and {@link DISCOUNT_RATE discount
+	 * rate}.
+	 * 
+	 * @return a {@link java.math.BigDecimal BigDecimal} value of the discount, by
+	 *         applying the discount rate to product price.<br>
+	 *         Uses Rounding mode HALF_EVEN with scale of 2.
 	 */
 	public BigDecimal getDiscount() {
 		return price.multiply(DISCOUNT_RATE).setScale(2, HALF_EVEN);
