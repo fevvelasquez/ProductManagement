@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 import me.fevvelasquez.pm.data.Product;
 
 /**
- * @version 0.4.1
+ * @version 0.4.2
  * @author oracle GNU GPL / fevvelasquez
  */
 public class Shop {
@@ -35,8 +35,10 @@ public class Shop {
 		p1.setId(101);
 		p1.setName("Tea");
 		p1.setPrice(BigDecimal.valueOf(1.99));
-		// Print Instance data values:
-		System.out.println("[id=" + p1.getId() + ", name=" + p1.getName() + ", price=" + p1.getPrice() + "]");
+		// Print Instance data values: // discount info added.
+		System.out.println("[id=" + p1.getId() + ", name=" + p1.getName() + ", price=" + p1.getPrice() + ", discount="
+				+ p1.getDiscount() + "]");
 
 	}
+
 }
