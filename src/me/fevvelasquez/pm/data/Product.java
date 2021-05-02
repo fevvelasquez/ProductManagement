@@ -25,7 +25,7 @@ import static java.math.RoundingMode.*;
  * Each product can have a discount, calculated based on {@link DISCOUNT_RATE}
  * discount rate.
  * 
- * @version 0.4.3
+ * @version 0.5.1 Create Enumeration to Represent Product Rating.
  * @author oracle GNU GPL / fevvelasquez
  */
 public class Product {
@@ -39,6 +39,7 @@ public class Product {
 	private int id;
 	private String name;
 	private BigDecimal price;
+	private Rating rating;
 
 	/**
 	 * @return the id
@@ -80,6 +81,13 @@ public class Product {
 	 */
 	public void setPrice(final BigDecimal price) {
 		this.price = price;
+	}
+
+	/**
+	 * @return the product rating.
+	 */
+	public Rating getRating() {
+		return rating;
 	}
 
 	/**
