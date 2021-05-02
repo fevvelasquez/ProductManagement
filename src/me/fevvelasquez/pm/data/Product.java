@@ -26,7 +26,7 @@ import static me.fevvelasquez.pm.data.Rating.*;
  * Each product can have a discount, calculated based on {@link DISCOUNT_RATE}
  * discount rate.
  * 
- * @version 0.5.2 Add Custom Constructors to the Product Class.
+ * @version 0.5.3 Make Product Objects Immutable.
  * @author oracle GNU GPL / fevvelasquez
  */
 public class Product {
@@ -37,10 +37,22 @@ public class Product {
 	 */
 	public static final BigDecimal DISCOUNT_RATE = new BigDecimal(String.valueOf("0.10"));
 
-	private int id;
-	private String name;
-	private BigDecimal price;
-	private Rating rating;
+	/**
+	 * Product id designed to be immutable cannot be changed.
+	 */
+	private final int id;
+	/**
+	 * Product name designed to be immutable cannot be changed.
+	 */
+	private final String name;
+	/**
+	 * Product price designed to be immutable cannot be changed.
+	 */
+	private final BigDecimal price;
+	/**
+	 * Product rating designed to be immutable cannot be changed.
+	 */
+	private final Rating rating;
 
 	/**
 	 * Main constructor.
@@ -74,17 +86,21 @@ public class Product {
 	}
 
 	/**
+	 * Creates a new instance from current, applying the new rating value received as parameter.
+	 * 
+	 * @param newRating Product new rating as {@code Rating} enum.
+	 * 
+	 */
+	public Product applyRating(Rating newRating) {
+		return new Product(id, name, price, newRating);
+		
+	}
+
+	/**
 	 * @return the Product id
 	 */
 	public int getId() {
 		return id;
-	}
-
-	/**
-	 * @param id the Product id to set
-	 */
-	public void setId(final int id) {
-		this.id = id;
 	}
 
 	/**
@@ -95,24 +111,10 @@ public class Product {
 	}
 
 	/**
-	 * @param name the Product name to set
-	 */
-	public void setName(final String name) {
-		this.name = name;
-	}
-
-	/**
 	 * @return the Product price
 	 */
 	public BigDecimal getPrice() {
 		return price;
-	}
-
-	/**
-	 * @param price the Product price to set
-	 */
-	public void setPrice(final BigDecimal price) {
-		this.price = price;
 	}
 
 	/**

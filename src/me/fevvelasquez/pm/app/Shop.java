@@ -23,7 +23,7 @@ import me.fevvelasquez.pm.data.Rating;
 /**
  * {@code Shop} class represents an application that manages Products.
  * 
- * @version 0.5.2 Add Custom Constructors to the Product Class.
+ * @version 0.5.3 Make Product Objects Immutable.
  * @author oracle GNU GPL / fevvelasquez
  */
 public class Shop {
@@ -36,10 +36,26 @@ public class Shop {
 		Product p1 = new Product(101, "Tea", BigDecimal.valueOf(1.99));
 		Product p2 = new Product(102, "Coffee", BigDecimal.valueOf(1.99), Rating.FOUR_STARS);
 		Product p3 = new Product(103, "Cake", BigDecimal.valueOf(3.99), Rating.FIVE_STARS);
-		// Print Instance data values:
-		System.out.println("[id=" + p1.getId() + ", price=" + p1.getPrice() + ", discount=" + p1.getDiscount() +", rating=" + p1.getRating().getStars() + ", name=" + p1.getName() + "]");
-		System.out.println("[id=" + p2.getId() + ", price=" + p2.getPrice() + ", discount=" + p2.getDiscount() +", rating=" + p2.getRating().getStars() + ", name=" + p2.getName() + "]");
-		System.out.println("[id=" + p3.getId() + ", price=" + p3.getPrice() + ", discount=" + p3.getDiscount() +", rating=" + p3.getRating().getStars() + ", name=" + p3.getName() + "]");
+
+		// Print products:
+		printProduct(p1);
+		printProduct(p2);
+		printProduct(p3);
+
+		// Apply product rating, creates a new Product instance because it is immutable:
+		System.out.println("--- Rating applied copy:");
+		printProduct(p3.applyRating(Rating.THREE_STARS));
+
+	}
+
+	/**
+	 * Print Instance data values.
+	 * 
+	 * @param p Product instance to print.
+	 */
+	public static void printProduct(Product p) {
+		System.out.println("[id=" + p.getId() + ", price=" + p.getPrice() + ", discount=" + p.getDiscount()
+				+ ", rating=" + p.getRating().getStars() + ", name=" + p.getName() + "]");
 
 	}
 
