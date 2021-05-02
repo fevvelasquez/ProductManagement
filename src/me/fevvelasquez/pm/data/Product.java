@@ -17,6 +17,7 @@ package me.fevvelasquez.pm.data;
 
 import java.math.BigDecimal;
 import static java.math.RoundingMode.*;
+import static me.fevvelasquez.pm.data.Rating.*;
 
 /**
  * {@code Product} class represents properties and behaviors of Product objects,
@@ -25,7 +26,7 @@ import static java.math.RoundingMode.*;
  * Each product can have a discount, calculated based on {@link DISCOUNT_RATE}
  * discount rate.
  * 
- * @version 0.5.1 Create Enumeration to Represent Product Rating.
+ * @version 0.5.2 Add Custom Constructors to the Product Class.
  * @author oracle GNU GPL / fevvelasquez
  */
 public class Product {
@@ -42,49 +43,80 @@ public class Product {
 	private Rating rating;
 
 	/**
-	 * @return the id
+	 * Main constructor.
+	 * 
+	 * @param id     Product id.
+	 * @param name   Product name.
+	 * @param price  Product Price.
+	 * @param rating Product Rating.
+	 */
+	public Product(int id, String name, BigDecimal price, Rating rating) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.price = price;
+		this.rating = rating;
+	}
+
+	/**
+	 * Calls {@link Product(int id, String name, BigDecimal price, Rating rating)
+	 * main constructor} setting the default value for the rating argument as
+	 * {@link Rating.NOT_RATED NOT_RATED}.
+	 * 
+	 * @param id    Product id.
+	 * @param name  Product name.
+	 * @param price Product Price.
+	 * 
+	 */
+	public Product(int id, String name, BigDecimal price) {
+		this(id, name, price, NOT_RATED);
+
+	}
+
+	/**
+	 * @return the Product id
 	 */
 	public int getId() {
 		return id;
 	}
 
 	/**
-	 * @param id the id to set
+	 * @param id the Product id to set
 	 */
 	public void setId(final int id) {
 		this.id = id;
 	}
 
 	/**
-	 * @return the name
+	 * @return the Product name
 	 */
 	public String getName() {
 		return name;
 	}
 
 	/**
-	 * @param name the name to set
+	 * @param name the Product name to set
 	 */
 	public void setName(final String name) {
 		this.name = name;
 	}
 
 	/**
-	 * @return the price
+	 * @return the Product price
 	 */
 	public BigDecimal getPrice() {
 		return price;
 	}
 
 	/**
-	 * @param price the price to set
+	 * @param price the Product price to set
 	 */
 	public void setPrice(final BigDecimal price) {
 		this.price = price;
 	}
 
 	/**
-	 * @return the product rating.
+	 * @return the Product rating.
 	 */
 	public Rating getRating() {
 		return rating;
@@ -96,7 +128,7 @@ public class Product {
 	 * 
 	 * @return a {@link java.math.BigDecimal BigDecimal} value of the discount, by
 	 *         applying the discount rate to product price.<br>
-	 *         Uses Rounding mode HALF_EVEN with scale of 2.
+	 *         Rounding mode HALF_EVEN with scale of 2.
 	 */
 	public BigDecimal getDiscount() {
 		return price.multiply(DISCOUNT_RATE).setScale(2, HALF_EVEN);

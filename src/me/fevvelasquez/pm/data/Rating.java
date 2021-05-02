@@ -21,7 +21,7 @@ package me.fevvelasquez.pm.data;
  * Possible enumeration values represent star rating cases using unicode
  * symbols.
  * 
- * @version 0.5.1 Create Enumeration to Represent Product Rating.
+ * @version 0.5.2 Add Custom Constructors to the Product Class.
  * @author oracle GNU GPL / fevvelasquez
  */
 public enum Rating {
@@ -60,7 +60,7 @@ public enum Rating {
 	}
 
 	/**
-	 * @return the unicode representation of stars Rating.
+	 * @return the unicode stars String representation of rating.
 	 */
 	public String getStars() {
 		return stars;
