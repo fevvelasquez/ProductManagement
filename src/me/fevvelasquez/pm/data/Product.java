@@ -29,10 +29,10 @@ import static me.fevvelasquez.pm.data.Rating.*;
  * Each product can have a discount, calculated based on {@link DISCOUNT_RATE}
  * discount rate.
  * 
- * @version 0.6.3. Create Product Manager Factory.
+ * @version 0.7.1. Design the Rateable Interface.
  * @author oracle GNU GPL / fevvelasquez
  */
-public abstract class Product {
+public abstract class Product implements Rateable<Product> {
 	/**
 	 * A constant that defines a {@link java.math.BigDecimal BigDecimal} of the
 	 * discount rate value.<br>
@@ -89,15 +89,6 @@ public abstract class Product {
 	}
 
 	/**
-	 * Creates a new instance from current, applying the new rating value received
-	 * as parameter.
-	 * 
-	 * @param newRating Product new rating as {@code Rating} enum.
-	 * 
-	 */
-	public abstract Product applyRating(Rating newRating);
-
-	/**
 	 * @return the Product id
 	 */
 	public int getId() {
@@ -121,6 +112,7 @@ public abstract class Product {
 	/**
 	 * @return the Product rating.
 	 */
+	@Override
 	public Rating getRating() {
 		return rating;
 	}
