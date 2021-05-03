@@ -16,14 +16,17 @@
 package me.fevvelasquez.pm.app;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
+import me.fevvelasquez.pm.data.Drink;
+import me.fevvelasquez.pm.data.Food;
 import me.fevvelasquez.pm.data.Product;
 import me.fevvelasquez.pm.data.Rating;
 
 /**
  * {@code Shop} class represents an application that manages Products.
  * 
- * @version 0.5.3 Make Product Objects Immutable.
+ * @version 0.6.1 Create Food and Drink Classes that Extend Product.
  * @author oracle GNU GPL / fevvelasquez
  */
 public class Shop {
@@ -32,10 +35,10 @@ public class Shop {
 	 * @param args No arguments needed.
 	 */
 	public static void main(String[] args) {
-		// Create 3 'Product' instances using constructor initialization:
+		// Create 'Product', 'Food' and 'Drink' instances, all assigned to Product generic references:
 		Product p1 = new Product(101, "Tea", BigDecimal.valueOf(1.99));
-		Product p2 = new Product(102, "Coffee", BigDecimal.valueOf(1.99), Rating.FOUR_STARS);
-		Product p3 = new Product(103, "Cake", BigDecimal.valueOf(3.99), Rating.FIVE_STARS);
+		Product p2 = new Drink(102, "Coffee", BigDecimal.valueOf(1.99), Rating.FOUR_STARS);
+		Product p3 = new Food(103, "Cake", BigDecimal.valueOf(3.99), Rating.FIVE_STARS, LocalDate.now().plusDays(2));
 
 		// Print products:
 		printProduct(p1);
