@@ -24,10 +24,10 @@ import java.time.LocalTime;
  * {@code Drink} class represents properties and behaviors of drink objects
  * which extends Product, in the Product Management System. <br>
  * 
- * @version 0.6.2. Override Methods and Use Polymorphism.
+ * @version 0.6.3. Create Product Manager Factory.
  * @author oracle GNU GPL / fevvelasquez
  */
-public class Drink extends Product {
+public final class Drink extends Product {
 
 	/**
 	 * @param id     Product id.
@@ -35,7 +35,7 @@ public class Drink extends Product {
 	 * @param price  Product Price.
 	 * @param rating Product Rating.
 	 */
-	public Drink(int id, String name, BigDecimal price, Rating rating) {
+	Drink(int id, String name, BigDecimal price, Rating rating) {
 		super(id, name, price, rating);
 	}
 

@@ -24,10 +24,10 @@ import java.time.LocalDate;
  * {@code Food} class represents properties and behaviors of food objects which
  * extends Product, in the Product Management System. <br>
  * 
- * @version 0.6.2. Override Methods and Use Polymorphism.
+ * @version 0.6.3. Create Product Manager Factory.
  * @author oracle GNU GPL / fevvelasquez
  */
-public class Food extends Product {
+public final class Food extends Product {
 
 	/**
 	 * Recommended best consume this product before this date.
@@ -41,7 +41,7 @@ public class Food extends Product {
 	 * @param rating     Product Rating.
 	 * @param bestBefore Best before date.
 	 */
-	public Food(int id, String name, BigDecimal price, Rating rating, LocalDate bestBefore) {
+	Food(int id, String name, BigDecimal price, Rating rating, LocalDate bestBefore) {
 		super(id, name, price, rating);
 		this.bestBefore = bestBefore;
 	}
@@ -68,7 +68,5 @@ public class Food extends Product {
 	public LocalDate getBestBefore() {
 		return bestBefore;
 	}
-	
-	
 
 }

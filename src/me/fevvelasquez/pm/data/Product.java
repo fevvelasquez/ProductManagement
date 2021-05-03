@@ -29,7 +29,7 @@ import static me.fevvelasquez.pm.data.Rating.*;
  * Each product can have a discount, calculated based on {@link DISCOUNT_RATE}
  * discount rate.
  * 
- * @version 0.6.2. Override Methods and Use Polymorphism.
+ * @version 0.6.3. Create Product Manager Factory.
  * @author oracle GNU GPL / fevvelasquez
  */
 public abstract class Product {
@@ -65,7 +65,7 @@ public abstract class Product {
 	 * @param price  Product Price.
 	 * @param rating Product Rating.
 	 */
-	public Product(int id, String name, BigDecimal price, Rating rating) {
+	Product(int id, String name, BigDecimal price, Rating rating) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -83,7 +83,7 @@ public abstract class Product {
 	 * @param price Product Price.
 	 * 
 	 */
-	public Product(int id, String name, BigDecimal price) {
+	Product(int id, String name, BigDecimal price) {
 		this(id, name, price, NOT_RATED);
 
 	}
