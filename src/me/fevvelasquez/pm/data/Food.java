@@ -15,6 +15,8 @@
  */
 package me.fevvelasquez.pm.data;
 
+import static java.math.RoundingMode.HALF_EVEN;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -22,7 +24,7 @@ import java.time.LocalDate;
  * {@code Food} class represents properties and behaviors of food objects which
  * extends Product, in the Product Management System. <br>
  * 
- * @version 0.6.1 Create Food and Drink Classes that Extend Product.
+ * @version 0.6.2. Override Methods and Use Polymorphism.
  * @author oracle GNU GPL / fevvelasquez
  */
 public class Food extends Product {
@@ -33,15 +35,40 @@ public class Food extends Product {
 	private LocalDate bestBefore;
 
 	/**
-	 * @param id     Product id.
-	 * @param name   Product name.
-	 * @param price  Product Price.
-	 * @param rating Product Rating.
+	 * @param id         Product id.
+	 * @param name       Product name.
+	 * @param price      Product Price.
+	 * @param rating     Product Rating.
 	 * @param bestBefore Best before date.
 	 */
 	public Food(int id, String name, BigDecimal price, Rating rating, LocalDate bestBefore) {
 		super(id, name, price, rating);
 		this.bestBefore = bestBefore;
 	}
+
+	@Override
+	public String toString() {
+		return super.toString() + " Food[bestBefore=" + bestBefore + "]";
+	}
+
+	@Override
+	public BigDecimal getDiscount() {
+		return bestBefore.isEqual(LocalDate.now()) ? super.getDiscount() : BigDecimal.ZERO.setScale(2, HALF_EVEN);
+	}
+
+	@Override
+	public Product applyRating(Rating newRating) {
+		return new Food(getId(), getName(), getPrice(), newRating, bestBefore);
+	}
+
+	/**
+	 * @return the bestBefore
+	 */
+	@Override
+	public LocalDate getBestBefore() {
+		return bestBefore;
+	}
+	
+	
 
 }

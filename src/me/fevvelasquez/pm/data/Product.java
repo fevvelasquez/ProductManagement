@@ -16,6 +16,9 @@
 package me.fevvelasquez.pm.data;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Objects;
+
 import static java.math.RoundingMode.*;
 import static me.fevvelasquez.pm.data.Rating.*;
 
@@ -26,10 +29,10 @@ import static me.fevvelasquez.pm.data.Rating.*;
  * Each product can have a discount, calculated based on {@link DISCOUNT_RATE}
  * discount rate.
  * 
- * @version 0.5.3 Make Product Objects Immutable.
+ * @version 0.6.2. Override Methods and Use Polymorphism.
  * @author oracle GNU GPL / fevvelasquez
  */
-public class Product {
+public abstract class Product {
 	/**
 	 * A constant that defines a {@link java.math.BigDecimal BigDecimal} of the
 	 * discount rate value.<br>
@@ -86,15 +89,13 @@ public class Product {
 	}
 
 	/**
-	 * Creates a new instance from current, applying the new rating value received as parameter.
+	 * Creates a new instance from current, applying the new rating value received
+	 * as parameter.
 	 * 
 	 * @param newRating Product new rating as {@code Rating} enum.
 	 * 
 	 */
-	public Product applyRating(Rating newRating) {
-		return new Product(id, name, price, newRating);
-		
-	}
+	public abstract Product applyRating(Rating newRating);
 
 	/**
 	 * @return the Product id
@@ -135,6 +136,36 @@ public class Product {
 	public BigDecimal getDiscount() {
 		return price.multiply(DISCOUNT_RATE).setScale(2, HALF_EVEN);
 
+	}
+
+	@Override
+	public String toString() {
+		return " Product[id=" + id + ", price=" + price + ", discount=" + getDiscount() + ", rating="
+				+ rating.getStars() + ", name=" + name + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, name, getClass());
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Product other = (Product) obj;
+		return id == other.id && Objects.equals(name, other.name);
+	}
+
+	/**
+	 * @return the bestBefore
+	 */
+	public LocalDate getBestBefore() {
+		return LocalDate.now();
 	}
 
 }

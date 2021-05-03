@@ -15,13 +15,16 @@
  */
 package me.fevvelasquez.pm.data;
 
+import static java.math.RoundingMode.HALF_EVEN;
+
 import java.math.BigDecimal;
+import java.time.LocalTime;
 
 /**
  * {@code Drink} class represents properties and behaviors of drink objects
  * which extends Product, in the Product Management System. <br>
  * 
- * @version 0.6.1 Create Food and Drink Classes that Extend Product.
+ * @version 0.6.2. Override Methods and Use Polymorphism.
  * @author oracle GNU GPL / fevvelasquez
  */
 public class Drink extends Product {
@@ -34,6 +37,18 @@ public class Drink extends Product {
 	 */
 	public Drink(int id, String name, BigDecimal price, Rating rating) {
 		super(id, name, price, rating);
+	}
+
+	@Override
+	public BigDecimal getDiscount() {
+		var now = LocalTime.now();
+		return (now.isAfter(LocalTime.of(17, 30)) && now.isBefore(LocalTime.of(22, 30))) ? super.getDiscount()
+				: BigDecimal.ZERO.setScale(2, HALF_EVEN);
+	}
+
+	@Override
+	public Product applyRating(Rating newRating) {
+		return new Drink(getId(), getName(), getPrice(), newRating);
 	}
 
 }
