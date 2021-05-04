@@ -17,6 +17,7 @@ package me.fevvelasquez.pm.app;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Locale;
 
 import me.fevvelasquez.pm.data.Product;
 import me.fevvelasquez.pm.data.ProductManager;
@@ -25,7 +26,7 @@ import me.fevvelasquez.pm.data.Rating;
 /**
  * {@code Shop} class represents an application that manages Products.
  * 
- * @version 0.6.3. Create Product Manager Factory.
+ * @version 0.7.2. Enable Products Review and Rating. Prepare Product Report.
  * @author oracle GNU GPL / fevvelasquez
  */
 public class Shop {
@@ -35,7 +36,7 @@ public class Shop {
 	 */
 	public static void main(String[] args) {
 		// Create instances through ProductManager factory methods.
-		var pm = new ProductManager();
+		var pm = new ProductManager(Locale.getDefault());
 		Product p1 = pm.createProduct(101, "Tea", BigDecimal.valueOf(1.99), Rating.THREE_STARS);
 		Product p2 = pm.createProduct(102, "Coffee", BigDecimal.valueOf(1.99), Rating.FOUR_STARS);
 		Product p3 = pm.createProduct(103, "Cake", BigDecimal.valueOf(3.99), Rating.FIVE_STARS,
@@ -68,6 +69,9 @@ public class Shop {
 		System.out.println(p1);
 		System.out.println(p3.applyRating(Rating.TWO_STARS));
 		System.out.println(p3);
+		
+		System.out.println();
+		pm.printProductReport();
 
 	}
 
