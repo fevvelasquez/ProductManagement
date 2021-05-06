@@ -16,9 +16,7 @@
 package me.fevvelasquez.pm.app;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Locale;
-
 import me.fevvelasquez.pm.data.Product;
 import me.fevvelasquez.pm.data.ProductManager;
 import me.fevvelasquez.pm.data.Rating;
@@ -26,7 +24,7 @@ import me.fevvelasquez.pm.data.Rating;
 /**
  * {@code Shop} class represents an application that manages Products.
  * 
- * @version 0.7.3. Test the Product Review Functionality.
+ * @version 0.8.1. Allow Multiple Reviews for a Product.
  * @author oracle GNU GPL / fevvelasquez
  */
 public class Shop {
@@ -35,19 +33,19 @@ public class Shop {
 	 * @param args No arguments needed.
 	 */
 	public static void main(String[] args) {
-		// For testing purpose only:
-		var pm_italy = new ProductManager(Locale.ITALY);
-		pm_italy.createProduct(0, "Tea", BigDecimal.valueOf(1.99), Rating.NOT_RATED);
-		// Print report with ITALY locale:
-		pm_italy.printProductReport();
-
 		// Create instances of Product with Product Manager Factory:
-		var pm = new ProductManager(Locale.getDefault());
+		var pm = new ProductManager(Locale.UK);
 		Product p1 = pm.createProduct(101, "Tea", BigDecimal.valueOf(1.99), Rating.NOT_RATED);
-		// Print report with locale:
+		// Print report:
 		pm.printProductReport();
-		// Write review:
-		pm.reviewProduct(p1, Rating.FOUR_STARS, "Nice hot cup of tea");
+		// Write reviews:
+		p1 = pm.reviewProduct(p1, Rating.FOUR_STARS, "Nice hot cup of tea");
+		p1 = pm.reviewProduct(p1, Rating.TWO_STARS, "Rather weak tea");
+		p1 = pm.reviewProduct(p1, Rating.FOUR_STARS, "Fine");
+		p1 = pm.reviewProduct(p1, Rating.FOUR_STARS, "Good tea!");
+		p1 = pm.reviewProduct(p1, Rating.FIVE_STARS, "Perfect.");
+		p1 = pm.reviewProduct(p1, Rating.THREE_STARS, "Just add some lemon");
+		// Print report:
 		pm.printProductReport();
 
 //		Product p2 = pm.createProduct(102, "Coffee", BigDecimal.valueOf(1.99), Rating.FOUR_STARS);

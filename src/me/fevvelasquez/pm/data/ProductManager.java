@@ -21,6 +21,7 @@ import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -28,7 +29,7 @@ import java.util.ResourceBundle;
  * {@code Product Manager} class represents a factory which creates instances of
  * Product subclasses. <br>
  * 
- * @version 0.7.2. Enable Products Review and Rating, Product Report.
+ * @version 0.8.1. Allow Multiple Reviews for a Product.
  * @author oracle GNU GPL / fevvelasquez
  */
 public class ProductManager {
@@ -39,13 +40,17 @@ public class ProductManager {
 	private NumberFormat currencyFormat;
 
 	private Product product;
-	private Review review;
+	private Review[] reviews;
+	{
+		// Instance initialization example:
+		reviews = new Review[5];
+	}
 
 	public ProductManager(Locale locale) {
 		this.locale = locale;
-		this.resources = ResourceBundle.getBundle("me.fevvelasquez.pm.data.resources", locale);
-		this.dtFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).localizedBy(locale);
-		this.currencyFormat = NumberFormat.getCurrencyInstance(locale);
+		this.resources = ResourceBundle.getBundle("me.fevvelasquez.pm.data.resources", this.locale);
+		this.dtFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).localizedBy(this.locale);
+		this.currencyFormat = NumberFormat.getCurrencyInstance(this.locale);
 	}
 
 	public Product createProduct(int id, String name, BigDecimal price, Rating rating, LocalDate bestBefore) {
@@ -61,35 +66,46 @@ public class ProductManager {
 	}
 
 	public Product reviewProduct(Product product, Rating rating, String comments) {
-		this.review = new Review(rating, comments);
-		this.product = product.applyRating(rating);
+		if (reviews[reviews.length - 1] != null) {
+			reviews = Arrays.copyOf(reviews, reviews.length + 5);
+		}
+
+		int sum = 0, i = 0;
+		boolean reviewed = false;
+
+		while (i < reviews.length && !reviewed) {
+			if (reviews[i] == null) {
+				reviews[i] = new Review(rating, comments);
+				reviewed = true;
+			}
+			sum += reviews[i].getRating().ordinal();
+			i++;
+		}
+
+		this.product = product.applyRating(Math.round((float) sum / i));
 		return this.product;
 	}
 
 	public void printProductReport() {
 		StringBuilder mssg = new StringBuilder();
-		mssg.append(
-				MessageFormat.format(
-						resources.getString("product"),
-						product.getName(),
-						currencyFormat.format(product.getPrice()),
-						product.getRating().getStars(),
-						dtFormatter.format(product.getBestBefore())
-						)
-				);
+		mssg.append(MessageFormat.format(resources.getString("product"), product.getName(),
+				currencyFormat.format(product.getPrice()), product.getRating().getStars(),
+				dtFormatter.format(product.getBestBefore())));
 		mssg.append("\n");
-		if(review!=null) {
-			mssg.append(
-					MessageFormat.format(
-							resources.getString("review"), 
-							review.getRating().getStars(),
-							review.getComments()
-							)
-					);
-		}else {
-			mssg.append(resources.getString("no.reviews"));
+
+		end_of_reviews: for (var review : reviews) {
+			if (review == null) {
+				break end_of_reviews;
+			}
+			mssg.append(MessageFormat.format(resources.getString("review"), review.getRating().getStars(),
+					review.getComments()));
+			mssg.append("\n");
 		}
-		mssg.append("\n");
+
+		if (reviews[0] == null) {
+			mssg.append(resources.getString("no.reviews"));
+			mssg.append("\n");
+		}
 		System.out.println(mssg);
 	}
 }
