@@ -19,10 +19,10 @@ package me.fevvelasquez.pm.data;
  * {@code Review} class represents product reviews. Each review is associated
  * with a rating and comments, in the Product Management System. <br>
  * 
- * @version 0.7.2. Enable Products Review and Rating. Prepare Product Report.
+ * @version 0.9.2. Implement Review Sort and Product Search Features.
  * @author oracle GNU GPL / fevvelasquez
  */
-public class Review {
+public class Review implements Comparable<Review> {
 	private Rating rating;
 	private String comments;
 
@@ -52,6 +52,11 @@ public class Review {
 	@Override
 	public String toString() {
 		return "Review [rating=" + rating + ", comments=" + comments + "]";
+	}
+
+	@Override
+	public int compareTo(Review other) {
+		return other.getRating().ordinal() - this.getRating().ordinal();
 	}
 
 }

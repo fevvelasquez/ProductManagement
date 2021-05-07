@@ -29,7 +29,7 @@ import static me.fevvelasquez.pm.data.Rating.*;
  * Each product can have a discount, calculated based on {@link DISCOUNT_RATE}
  * discount rate.
  * 
- * @version 0.7.1. Design the Rateable Interface.
+ * @version 0.9.2. Implement Review Sort and Product Search Features.
  * @author oracle GNU GPL / fevvelasquez
  */
 public abstract class Product implements Rateable<Product> {
@@ -138,19 +138,18 @@ public abstract class Product implements Rateable<Product> {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, name, getClass());
+		return Objects.hash(id);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
+		// Now we don't care if objects are different child kind.
+		if (!(obj instanceof Product))
 			return false;
 		Product other = (Product) obj;
-		return id == other.id && Objects.equals(name, other.name);
+		return id == other.id;
 	}
 
 	/**

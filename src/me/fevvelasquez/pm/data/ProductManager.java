@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -32,7 +33,7 @@ import java.util.ResourceBundle;
  * {@code Product Manager} class represents a factory which creates instances of
  * Product subclasses. <br>
  * 
- * @version 0.9.1. Organize Products and Reviews into a HashMap.
+ * @version 0.9.2. Implement Review Sort and Product Search Features.
  * @author oracle GNU GPL / fevvelasquez
  */
 public class ProductManager {
@@ -69,6 +70,10 @@ public class ProductManager {
 
 	}
 
+	public Product reviewProduct(int id, Rating rating, String comments) {
+		return reviewProduct(findProduct(id), rating, comments);
+	}
+
 	public Product reviewProduct(Product product, Rating rating, String comments) {
 		List<Review> reviews = products.get(product);
 		products.remove(product, reviews);
@@ -84,6 +89,10 @@ public class ProductManager {
 		return product;
 	}
 
+	public void printProductReport(int id) {
+		printProductReport(findProduct(id));
+	}
+
 	public void printProductReport(Product product) {
 		List<Review> reviews = products.get(product);
 
@@ -93,6 +102,7 @@ public class ProductManager {
 				dtFormatter.format(product.getBestBefore())));
 		mssg.append("\n");
 
+		Collections.sort(reviews);
 		for (var review : reviews) {
 			mssg.append(MessageFormat.format(resources.getString("review"), review.getRating().getStars(),
 					review.getComments()));
@@ -104,5 +114,17 @@ public class ProductManager {
 			mssg.append("\n");
 		}
 		System.out.println(mssg);
+	}
+
+	public Product findProduct(int id) {
+		Product result = null;
+		for (var product : products.keySet()) {
+			if (product.getId() == id) {
+				result = product;
+				break;
+			}
+		}
+
+		return result;
 	}
 }
