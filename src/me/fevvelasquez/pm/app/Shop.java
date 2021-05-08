@@ -17,7 +17,6 @@ package me.fevvelasquez.pm.app;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Locale;
 import me.fevvelasquez.pm.data.Product;
 import me.fevvelasquez.pm.data.ProductManager;
 import me.fevvelasquez.pm.data.Rating;
@@ -25,7 +24,7 @@ import me.fevvelasquez.pm.data.Rating;
 /**
  * {@code Shop} class represents an application that manages Products.
  * 
- * @version 0.9.2. Implement Review Sort and Product Search Features.
+ * @version 0.10.1. Refactor ProductManager to Use a Nested Class.
  * @author oracle GNU GPL / fevvelasquez
  */
 public class Shop {
@@ -34,8 +33,17 @@ public class Shop {
 	 * @param args No arguments needed.
 	 */
 	public static void main(String[] args) {
-		// Create products factory with LOCALE
-		var pm = new ProductManager(Locale.UK);
+
+		// Supported locales:
+		System.out.println("Supported locales:");
+		for (var locale : ProductManager.getSupportedLocales()) {
+			System.out.println(locale);
+		}
+		System.out.println();
+		// ----------------------------------------------------------------------
+
+		// Create products factory using default LOCALE
+		var pm = new ProductManager("xx-XX");
 		// ----------------------------------------------------------------------
 
 		// Test id 101, NOT RATED case
@@ -53,6 +61,8 @@ public class Shop {
 		pm.printProductReport(101);
 		// ----------------------------------------------------------------------
 
+		// change locale:
+		pm.changeLocale("es-MX");
 		// Test id 102, Multiple reviews
 		pm.createProduct(102, "Coffee", BigDecimal.valueOf(1.99), Rating.NOT_RATED);
 		pm.reviewProduct(102, Rating.THREE_STARS, "Coffe was ok");
@@ -61,6 +71,8 @@ public class Shop {
 		pm.printProductReport(102);
 		// ----------------------------------------------------------------------
 
+		// change locale:
+		pm.changeLocale("ru-RU");
 		// Test id 103, Multiple reviews
 		pm.createProduct(103, "Cake", BigDecimal.valueOf(3.99), Rating.NOT_RATED, LocalDate.now().plusDays(2));
 		pm.reviewProduct(103, Rating.FIVE_STARS, "Very nice cake");
@@ -69,6 +81,8 @@ public class Shop {
 		pm.printProductReport(103);
 		// ----------------------------------------------------------------------
 
+		// change locale:
+		pm.changeLocale("fr-FR");
 		// Test id 104, Multiple reviews
 		pm.createProduct(104, "Cookie", BigDecimal.valueOf(2.99), Rating.NOT_RATED, LocalDate.now());
 		pm.reviewProduct(104, Rating.THREE_STARS, "Just another cookie");
@@ -83,6 +97,8 @@ public class Shop {
 		pm.printProductReport(p5);
 		// ----------------------------------------------------------------------
 
+		// change locale:
+		pm.changeLocale("zh-CN");
 		// Test id 106, Multiple reviews
 		pm.createProduct(106, "Chocolate", BigDecimal.valueOf(2.50), Rating.NOT_RATED, LocalDate.now().plusDays(3));
 		pm.reviewProduct(106, Rating.TWO_STARS, "Too sweet");
