@@ -23,6 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -34,7 +35,7 @@ import java.util.Set;
  * {@code Product Manager} class represents a factory which creates instances of
  * Product subclasses. <br>
  * 
- * @version 0.10.1. Refactor ProductManager to Use a Nested Class.
+ * @version 0.10.2. Produce Customized Product Reports.
  * @author oracle GNU GPL / fevvelasquez
  */
 public class ProductManager {
@@ -141,6 +142,18 @@ public class ProductManager {
 		return result;
 	}
 
+	public void printProducts(Comparator<Product> sorter) {
+		List<Product> productsList = new ArrayList<>(products.keySet());
+		productsList.sort(sorter);
+
+		StringBuilder mssg = new StringBuilder();
+		for (var product : productsList) {
+			mssg.append(rformatter.formatProduct(product));
+			mssg.append("\n");
+		}
+		System.out.println(mssg);
+	}
+
 	/**
 	 * static nested helper class to encapsulate management of text resources and
 	 * localization. <br>
@@ -155,7 +168,7 @@ public class ProductManager {
 		private ResourceFormatter(Locale locale) {
 			this.locale = locale;
 			this.resources = ResourceBundle.getBundle("me.fevvelasquez.pm.data.resources", this.locale);
-			this.dtFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).localizedBy(this.locale);
+			this.dtFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).localizedBy(this.locale);
 			this.currencyFormat = NumberFormat.getCurrencyInstance(this.locale);
 		}
 
