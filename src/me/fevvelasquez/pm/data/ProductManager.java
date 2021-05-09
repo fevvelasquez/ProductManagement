@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  * {@code Product Manager} class represents a factory which creates instances of
  * Product subclasses. <br>
  * 
- * @version 0.11.1. Modify Product Manager to Use Streams.
+ * @version 0.11.2. Add Discount per Rating Calculation.
  * @author oracle GNU GPL / fevvelasquez
  */
 public class ProductManager {
@@ -130,6 +130,24 @@ public class ProductManager {
 				.map(p -> rformatter.formatProduct(p) + "\n").collect(Collectors.joining()));
 
 		System.out.println(mssg);
+	}
+
+	/**
+	 * Using Streams to implement calculation, formatting and data regrouping logic
+	 * may improve performance by merging a number of data manipulations into a
+	 * single pass on data and potentially benefiting from parallel stream
+	 * processing capabilities in case you may have to handle a very large collection
+	 * of products.
+	 * 
+	 * @return a total of all discount values for each group of products that have
+	 *         the same rating.
+	 */
+	public Map<String, String> getDiscounts() {
+		return products.keySet().stream()
+				.collect(Collectors.groupingBy(p -> p.getRating().getStars(),
+						Collectors.collectingAndThen(Collectors.summingDouble(p -> p.getDiscount().doubleValue()),
+								discount -> rformatter.currencyFormat.format(discount))));
+
 	}
 
 	/**

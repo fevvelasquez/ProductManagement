@@ -17,8 +17,6 @@ package me.fevvelasquez.pm.app;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Comparator;
-
 import me.fevvelasquez.pm.data.Product;
 import me.fevvelasquez.pm.data.ProductManager;
 import me.fevvelasquez.pm.data.Rating;
@@ -26,7 +24,7 @@ import me.fevvelasquez.pm.data.Rating;
 /**
  * {@code Shop} class represents an application that manages Products.
  * 
- * @version 0.11.1. Modify Product Manager to Use Streams.
+ * @version 0.11.2. Add Discount per Rating Calculation.
  * @author oracle GNU GPL / fevvelasquez
  */
 public class Shop {
@@ -50,7 +48,7 @@ public class Shop {
 
 		// Test id 101, NOT RATED case
 		pm.createProduct(101, "Tea", BigDecimal.valueOf(1.99), Rating.NOT_RATED);
-		pm.printProductReport(101);
+//		pm.printProductReport(101);
 		// ----------------------------------------------------------------------
 
 		// Test id 101, Multiple reviews
@@ -60,7 +58,7 @@ public class Shop {
 		pm.reviewProduct(101, Rating.FOUR_STARS, "Good tea!");
 		pm.reviewProduct(101, Rating.FIVE_STARS, "Perfect.");
 		pm.reviewProduct(101, Rating.THREE_STARS, "Just add some lemon");
-		pm.printProductReport(101);
+//		pm.printProductReport(101);
 		// ----------------------------------------------------------------------
 
 		// change locale:
@@ -110,28 +108,32 @@ public class Shop {
 //		pm.printProductReport(106);
 		// ----------------------------------------------------------------------
 
-		// STREAM EXAMPLES: =======================================================
-
-		// Sort by name length, implementing Comparator interface inline:
-		System.out.println("--- Sort by name length, ALL:");
-		pm.printProducts(p -> true, new Comparator<>() {
-			@Override
-			public int compare(Product p1, Product p2) {
-				return p1.getName().length() - p2.getName().length();
-			}
-		});
+//		// STREAM EXAMPLES: =======================================================
+//
+//		// Sort by name length, implementing Comparator interface inline:
+//		System.out.println("--- Sort by name length, ALL:");
+//		pm.printProducts(p -> true, new Comparator<>() {
+//			@Override
+//			public int compare(Product p1, Product p2) {
+//				return p1.getName().length() - p2.getName().length();
+//			}
+//		});
+//		// ----------------------------------------------------------------------
+//
+//		// Sort by price example, using lambda expression directly as a parameter:
+//		System.out.println("--- Sort by price, start with 'C' ONLY:");
+//		pm.printProducts(p -> p.getName().startsWith("C"), (p1, p2) -> p1.getPrice().compareTo(p2.getPrice()));
+//		// ----------------------------------------------------------------------
+//
+//		// Sort by rating example, creating Comparator object.:
+//		System.out.println("--- Sort by rating, then by name length. Reversed, price < 2 ONLY:");
+//		Comparator<Product> ratingAsc = (p1, p2) -> p1.getRating().ordinal() - p2.getRating().ordinal();
+//		Comparator<Product> nameLengthAsc = (p1, p2) -> p1.getName().length() - p2.getName().length();
+//		pm.printProducts(p -> p.getPrice().floatValue() < 2, nameLengthAsc.thenComparing(ratingAsc).reversed());
 		// ----------------------------------------------------------------------
 
-		// Sort by price example, using lambda expression directly as a parameter:
-		System.out.println("--- Sort by price, start with 'C' ONLY:");
-		pm.printProducts(p -> p.getName().startsWith("C"), (p1, p2) -> p1.getPrice().compareTo(p2.getPrice()));
-		// ----------------------------------------------------------------------
-
-		// Sort by rating example, creating Comparator object.:
-		System.out.println("--- Sort by rating, then by name length. Reversed, price < 2 ONLY:");
-		Comparator<Product> ratingAsc = (p1, p2) -> p1.getRating().ordinal() - p2.getRating().ordinal();
-		Comparator<Product> nameLengthAsc = (p1, p2) -> p1.getName().length() - p2.getName().length();
-		pm.printProducts(p -> p.getPrice().floatValue() < 2, nameLengthAsc.thenComparing(ratingAsc).reversed());
+		// test:
+		pm.getDiscounts().forEach((rating, discount) -> System.out.println(rating + "\t" + discount));
 		// ----------------------------------------------------------------------
 	}
 
