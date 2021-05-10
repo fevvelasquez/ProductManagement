@@ -24,7 +24,7 @@ import me.fevvelasquez.pm.data.Rating;
 /**
  * {@code Shop} class represents an application that manages Products.
  * 
- * @version 0.11.2. Add Discount per Rating Calculation.
+ * @version 0.12.1. Use Exception Handling to Fix Logical Errors.
  * @author oracle GNU GPL / fevvelasquez
  */
 public class Shop {
@@ -46,9 +46,15 @@ public class Shop {
 		var pm = new ProductManager("en-GB");
 		// ----------------------------------------------------------------------
 
+		// Test id 11 which does not exists!, now throws an exception. =======
+		pm.printProductReport(11);
+		pm.reviewProduct(11, Rating.FOUR_STARS, "test comments");;
+		// ----------------------------------------------------------------------
+		
+		
 		// Test id 101, NOT RATED case
 		pm.createProduct(101, "Tea", BigDecimal.valueOf(1.99), Rating.NOT_RATED);
-//		pm.printProductReport(101);
+		pm.printProductReport(101);
 		// ----------------------------------------------------------------------
 
 		// Test id 101, Multiple reviews

@@ -30,22 +30,27 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
  * {@code Product Manager} class represents a factory which creates instances of
  * Product subclasses. <br>
  * 
- * @version 0.11.2. Add Discount per Rating Calculation.
+ * @version 0.12.1. Use Exception Handling to Fix Logical Errors.
  * @author oracle GNU GPL / fevvelasquez
  */
 public class ProductManager {
+	private static final Logger logger;
 
 	private ResourceFormatter rformatter;
 	private Map<Product, List<Review>> products = new HashMap<>();
 
 	private static Map<String, ResourceFormatter> rformatters;
 	static {
+		logger = Logger.getLogger(ProductManager.class.getName());
+
 		rformatters = Map.of("en-GB", new ResourceFormatter(Locale.UK), "en-US", new ResourceFormatter(Locale.US),
 				"fr-FR", new ResourceFormatter(Locale.FRANCE), "ru-RU", new ResourceFormatter(new Locale("ru", "RU")),
 				"zh-CN", new ResourceFormatter(Locale.CHINA), "es-MX", new ResourceFormatter(new Locale("es", "MX")));
@@ -84,7 +89,12 @@ public class ProductManager {
 	}
 
 	public Product reviewProduct(int id, Rating rating, String comments) {
-		return reviewProduct(findProduct(id), rating, comments);
+		try {
+			return reviewProduct(findProduct(id), rating, comments);
+		} catch (ProductManagerException e) {
+			logger.info(e.getMessage());
+		}
+		return null;
 	}
 
 	public Product reviewProduct(Product product, Rating rating, String comments) {
@@ -100,7 +110,11 @@ public class ProductManager {
 	}
 
 	public void printProductReport(int id) {
-		printProductReport(findProduct(id));
+		try {
+			printProductReport(findProduct(id));
+		} catch (ProductManagerException e) {
+			logger.log(Level.INFO, "Could not print Product Report with id:" + id + ".", e);
+		}
 	}
 
 	public void printProductReport(Product product) {
@@ -120,8 +134,9 @@ public class ProductManager {
 		System.out.println(mssg);
 	}
 
-	public Product findProduct(int id) {
-		return products.keySet().stream().filter(p -> p.getId() == id).findFirst().orElseGet(() -> null);
+	public Product findProduct(int id) throws ProductManagerException {
+		return products.keySet().stream().filter(p -> p.getId() == id).findFirst()
+				.orElseThrow(() -> new ProductManagerException("Product id:" + id + ", not found."));
 	}
 
 	public void printProducts(Predicate<Product> filter, Comparator<Product> sorter) {
@@ -136,8 +151,8 @@ public class ProductManager {
 	 * Using Streams to implement calculation, formatting and data regrouping logic
 	 * may improve performance by merging a number of data manipulations into a
 	 * single pass on data and potentially benefiting from parallel stream
-	 * processing capabilities in case you may have to handle a very large collection
-	 * of products.
+	 * processing capabilities in case you may have to handle a very large
+	 * collection of products.
 	 * 
 	 * @return a total of all discount values for each group of products that have
 	 *         the same rating.
