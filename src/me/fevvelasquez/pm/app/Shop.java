@@ -24,7 +24,7 @@ import me.fevvelasquez.pm.data.Rating;
 /**
  * {@code Shop} class represents an application that manages Products.
  * 
- * @version 0.12.1. Use Exception Handling to Fix Logical Errors.
+ * @version 0.12.2. Add Text Parsing Operations.
  * @author oracle GNU GPL / fevvelasquez
  */
 public class Shop {
@@ -47,24 +47,30 @@ public class Shop {
 		// ----------------------------------------------------------------------
 
 		// Test id 11 which does not exists!, now throws an exception. =======
-		pm.printProductReport(11);
-		pm.reviewProduct(11, Rating.FOUR_STARS, "test comments");;
+//		pm.printProductReport(11);
+//		pm.reviewProduct(11, Rating.FOUR_STARS, "test comments");;
 		// ----------------------------------------------------------------------
-		
-		
+
 		// Test id 101, NOT RATED case
-		pm.createProduct(101, "Tea", BigDecimal.valueOf(1.99), Rating.NOT_RATED);
+//		pm.createProduct(101, "Tea", BigDecimal.valueOf(1.99), Rating.NOT_RATED);
+		pm.parseProduct("D/101/Tea/1.99/0/");
 		pm.printProductReport(101);
 		// ----------------------------------------------------------------------
 
 		// Test id 101, Multiple reviews
-		pm.reviewProduct(101, Rating.FOUR_STARS, "Nice hot cup of tea");
-		pm.reviewProduct(101, Rating.TWO_STARS, "Rather weak tea");
-		pm.reviewProduct(101, Rating.FOUR_STARS, "Fine");
-		pm.reviewProduct(101, Rating.FOUR_STARS, "Good tea!");
-		pm.reviewProduct(101, Rating.FIVE_STARS, "Perfect.");
-		pm.reviewProduct(101, Rating.THREE_STARS, "Just add some lemon");
-//		pm.printProductReport(101);
+		pm.parseReview("101/4/Nice hot cup of tea");
+		pm.parseReview("101/2/Rather weak tea");
+		pm.parseReview("101/4/Fine");
+		pm.parseReview("101/x/Good Tea!");
+		pm.parseReview("101/5/Perfect");
+		pm.parseReview("101/3/Just add some lemon");
+//		pm.reviewProduct(101, Rating.FOUR_STARS, "Nice hot cup of tea");
+//		pm.reviewProduct(101, Rating.TWO_STARS, "Rather weak tea");
+//		pm.reviewProduct(101, Rating.FOUR_STARS, "Fine");
+//		pm.reviewProduct(101, Rating.FOUR_STARS, "Good tea!");
+//		pm.reviewProduct(101, Rating.FIVE_STARS, "Perfect.");
+//		pm.reviewProduct(101, Rating.THREE_STARS, "Just add some lemon");
+		pm.printProductReport(101);
 		// ----------------------------------------------------------------------
 
 		// change locale:
@@ -80,11 +86,12 @@ public class Shop {
 		// change locale:
 //		pm.changeLocale("ru-RU");
 		// Test id 103, Multiple reviews
-		pm.createProduct(103, "Cake", BigDecimal.valueOf(3.99), Rating.NOT_RATED, LocalDate.now().plusDays(2));
+		pm.parseProduct("F/103/Cake/3.99/0/2021-05-13");
+//		pm.createProduct(103, "Cake", BigDecimal.valueOf(3.99), Rating.NOT_RATED, LocalDate.now().plusDays(2));
 		pm.reviewProduct(103, Rating.FIVE_STARS, "Very nice cake");
 		pm.reviewProduct(103, Rating.FOUR_STARS, "It's good, but I've expected more chocolate");
 		pm.reviewProduct(103, Rating.FIVE_STARS, "This cake it's perfect!");
-//		pm.printProductReport(103);
+		pm.printProductReport(103);
 		// ----------------------------------------------------------------------
 
 		// change locale:
@@ -139,7 +146,7 @@ public class Shop {
 		// ----------------------------------------------------------------------
 
 		// test:
-		pm.getDiscounts().forEach((rating, discount) -> System.out.println(rating + "\t" + discount));
+//		pm.getDiscounts().forEach((rating, discount) -> System.out.println(rating + "\t" + discount));
 		// ----------------------------------------------------------------------
 	}
 

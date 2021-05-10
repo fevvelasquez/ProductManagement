@@ -18,8 +18,10 @@ package me.fevvelasquez.pm.data;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -38,22 +40,30 @@ import java.util.stream.Collectors;
  * {@code Product Manager} class represents a factory which creates instances of
  * Product subclasses. <br>
  * 
- * @version 0.12.1. Use Exception Handling to Fix Logical Errors.
+ * @version 0.12.2. Add Text Parsing Operations.
  * @author oracle GNU GPL / fevvelasquez
  */
 public class ProductManager {
-	private static final Logger logger;
-
-	private ResourceFormatter rformatter;
-	private Map<Product, List<Review>> products = new HashMap<>();
 
 	private static Map<String, ResourceFormatter> rformatters;
+	private static final Logger logger;
 	static {
 		logger = Logger.getLogger(ProductManager.class.getName());
 
 		rformatters = Map.of("en-GB", new ResourceFormatter(Locale.UK), "en-US", new ResourceFormatter(Locale.US),
 				"fr-FR", new ResourceFormatter(Locale.FRANCE), "ru-RU", new ResourceFormatter(new Locale("ru", "RU")),
 				"zh-CN", new ResourceFormatter(Locale.CHINA), "es-MX", new ResourceFormatter(new Locale("es", "MX")));
+	}
+
+	private ResourceBundle config;
+	private MessageFormat reviewFormat;
+	private MessageFormat productFormat;
+	private ResourceFormatter rformatter;
+	private Map<Product, List<Review>> products = new HashMap<>();
+	{
+		config = ResourceBundle.getBundle("me.fevvelasquez.pm.data.parse");
+		reviewFormat = new MessageFormat(config.getString("review.data.format"));
+		productFormat = new MessageFormat(config.getString("product.data.format"));
 	}
 
 	public ProductManager(Locale locale) {
@@ -109,11 +119,44 @@ public class ProductManager {
 		return product;
 	}
 
+	public void parseReview(String text) {
+		try {
+			Object[] values = reviewFormat.parse(text);
+			reviewProduct(Integer.parseInt((String) values[0]),
+					Rateable.ratingValueOf(Integer.parseInt((String) values[1])), (String) values[2]);
+		} catch (ParseException | NumberFormatException e) {
+			logger.warning("Error Parsing Review \"" + text + "\"");
+		}
+	}
+
+	public void parseProduct(String text) {
+		try {
+			Object[] values = productFormat.parse(text);
+			int id = Integer.parseInt((String) values[1]);
+			String name = (String) values[2];
+			BigDecimal price = new BigDecimal((String) values[3]);
+			Rating rating = Rateable.ratingValueOf(Integer.parseInt((String) values[4]));
+			switch ((String) values[0]) {
+			case "D":
+				createProduct(id, name, price, rating);
+				break;
+			case "F":
+				LocalDate bestBefore = LocalDate.parse((String) values[5]);
+				createProduct(id, name, price, rating, bestBefore);
+				break;
+			}
+
+		} catch (ParseException | NumberFormatException | DateTimeParseException e) {
+			logger.warning("Error Parsing Product \"" + text + "\"");
+		}
+
+	}
+
 	public void printProductReport(int id) {
 		try {
 			printProductReport(findProduct(id));
 		} catch (ProductManagerException e) {
-			logger.log(Level.INFO, "Could not print Product Report with id:" + id + ".", e);
+			logger.log(Level.INFO, "Could not print Product Report with id:" + id + ".");
 		}
 	}
 
