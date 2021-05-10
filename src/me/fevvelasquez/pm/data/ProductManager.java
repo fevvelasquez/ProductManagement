@@ -16,6 +16,10 @@
 package me.fevvelasquez.pm.data;
 
 import java.math.BigDecimal;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -40,7 +44,7 @@ import java.util.stream.Collectors;
  * {@code Product Manager} class represents a factory which creates instances of
  * Product subclasses. <br>
  * 
- * @version 0.12.2. Add Text Parsing Operations.
+ * @version 0.13.1. Print Product Report to a File.
  * @author oracle GNU GPL / fevvelasquez
  */
 public class ProductManager {
@@ -60,10 +64,15 @@ public class ProductManager {
 	private MessageFormat productFormat;
 	private ResourceFormatter rformatter;
 	private Map<Product, List<Review>> products = new HashMap<>();
+
+	private Path reportsFolder;
+
 	{
-		config = ResourceBundle.getBundle("me.fevvelasquez.pm.data.parse");
+		config = ResourceBundle.getBundle("me.fevvelasquez.pm.data.config");
 		reviewFormat = new MessageFormat(config.getString("review.data.format"));
 		productFormat = new MessageFormat(config.getString("product.data.format"));
+
+		reportsFolder = Path.of(config.getString("reports.folder"));
 	}
 
 	public ProductManager(Locale locale) {
@@ -157,24 +166,33 @@ public class ProductManager {
 			printProductReport(findProduct(id));
 		} catch (ProductManagerException e) {
 			logger.log(Level.INFO, "Could not print Product Report with id:" + id + ".");
+		} catch (UnsupportedEncodingException e) {
+			logger.config("UnsupportedEncoding, error writing Product Report for product id:" + id + ".");
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, "IOException, error writing Product Report for product id:" + id + ".",
+					e.getStackTrace());
+			e.printStackTrace();
 		}
 	}
 
-	public void printProductReport(Product product) {
+	public void printProductReport(Product product) throws UnsupportedEncodingException, IOException {
 		List<Review> reviews = products.get(product);
+		Path productFile = reportsFolder
+				.resolve(MessageFormat.format(config.getString("report.file"), product.getId()));
 
-		StringBuilder mssg = new StringBuilder();
-		mssg.append(rformatter.formatProduct(product));
-		mssg.append("\n");
+		try (PrintWriter out = new PrintWriter(
+				new OutputStreamWriter(Files.newOutputStream(productFile, StandardOpenOption.CREATE), "UTF-8"))) {
 
-		if (reviews.isEmpty()) {
-			mssg.append(rformatter.getString("no.reviews") + "\n");
-		} else {
-			// Collections.sort(reviews);
-			mssg.append(reviews.stream().sorted().map(r -> rformatter.formatReview(r) + "\n")
-					.collect(Collectors.joining()));
+			out.append(rformatter.formatProduct(product) + System.lineSeparator());
+			if (reviews.isEmpty()) {
+				out.append(rformatter.getString("no.reviews") + System.lineSeparator());
+			} else {
+				out.append(reviews.stream().sorted().map(r -> rformatter.formatReview(r) + System.lineSeparator())
+						.collect(Collectors.joining()));
+			}
 		}
-		System.out.println(mssg);
+		System.out.println("See: \"" + productFile + "\"");
+
 	}
 
 	public Product findProduct(int id) throws ProductManagerException {

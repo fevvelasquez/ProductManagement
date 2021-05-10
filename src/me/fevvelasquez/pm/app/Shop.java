@@ -24,7 +24,7 @@ import me.fevvelasquez.pm.data.Rating;
 /**
  * {@code Shop} class represents an application that manages Products.
  * 
- * @version 0.12.2. Add Text Parsing Operations.
+ * @version 0.13.1. Print Product Report to a File.
  * @author oracle GNU GPL / fevvelasquez
  */
 public class Shop {
@@ -54,14 +54,14 @@ public class Shop {
 		// Test id 101, NOT RATED case
 //		pm.createProduct(101, "Tea", BigDecimal.valueOf(1.99), Rating.NOT_RATED);
 		pm.parseProduct("D/101/Tea/1.99/0/");
-		pm.printProductReport(101);
+		//pm.printProductReport(101);
 		// ----------------------------------------------------------------------
 
 		// Test id 101, Multiple reviews
 		pm.parseReview("101/4/Nice hot cup of tea");
 		pm.parseReview("101/2/Rather weak tea");
 		pm.parseReview("101/4/Fine");
-		pm.parseReview("101/x/Good Tea!");
+		pm.parseReview("101/4/Good Tea!");
 		pm.parseReview("101/5/Perfect");
 		pm.parseReview("101/3/Just add some lemon");
 //		pm.reviewProduct(101, Rating.FOUR_STARS, "Nice hot cup of tea");
@@ -91,7 +91,7 @@ public class Shop {
 		pm.reviewProduct(103, Rating.FIVE_STARS, "Very nice cake");
 		pm.reviewProduct(103, Rating.FOUR_STARS, "It's good, but I've expected more chocolate");
 		pm.reviewProduct(103, Rating.FIVE_STARS, "This cake it's perfect!");
-		pm.printProductReport(103);
+		//pm.printProductReport(103);
 		// ----------------------------------------------------------------------
 
 		// change locale:
