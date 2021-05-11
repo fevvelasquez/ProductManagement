@@ -25,7 +25,7 @@ import me.fevvelasquez.pm.data.Rating;
 /**
  * {@code Shop} class represents an application that manages Products.
  * 
- * @version 0.13.2. Bulk-Load Data from Files.
+ * @version 0.13.3. Implement Memory Swap Mechanism. TEST TEMP
  * @author oracle GNU GPL / fevvelasquez
  */
 public class Shop {
@@ -39,8 +39,8 @@ public class Shop {
 		// ----------------------------------------------------------------------
 
 		// From files:
-		pm.printProductReport(1101);
-		pm.printProductReport(1102);
+//		pm.printProductReport(1101);
+//		pm.printProductReport(1102);
 		// ----------------------------------------------------------------------
 
 		// From Shop class:
@@ -51,18 +51,29 @@ public class Shop {
 		pm.reviewProduct(2201, Rating.FOUR_STARS, "Good tea!");
 		pm.reviewProduct(2201, Rating.FIVE_STARS, "Perfect.");
 		pm.reviewProduct(2201, Rating.THREE_STARS, "Just add some lemon");
-		pm.printProductReport(2201);
+//		pm.printProductReport(2201);
 		// ----------------------------------------------------------------------
 		pm.createProduct(2202, "Cookie", BigDecimal.valueOf(2.99), Rating.NOT_RATED, LocalDate.now());
 		pm.reviewProduct(2202, Rating.THREE_STARS, "Just another cookie");
 		pm.reviewProduct(2202, Rating.THREE_STARS, "Meh");
-		pm.printProductReport(2202);
+//		pm.printProductReport(2202);S
 		// ----------------------------------------------------------------------
 
 		// STREAM EXAMPLES: =======================================================
 		System.out.println("\n=== Print Products:");
-		// Comparator<Product> ratingAsc = (p1, p2) -> p1.getRating().ordinal() - p2.getRating().ordinal();
+		// Comparator<Product> ratingAsc = (p1, p2) -> p1.getRating().ordinal() -
+		// p2.getRating().ordinal();
 		Comparator<Product> nameLengthAsc = (p1, p2) -> p1.getName().length() - p2.getName().length();
+		pm.printProducts(p -> true, nameLengthAsc);
+		// ----------------------------------------------------------------------
+
+		// TEST MEMORY SWAP
+		System.out.println("\n=== Print Products: dumbData()  MEMORY SWAP TEST");
+		pm.dumpData();
+		pm.printProducts(p -> true, nameLengthAsc);
+		// ----------------------------------------------------------------------
+		System.out.println("\n=== Print Products: restoreData() MEMORY SWAP TEST");
+		pm.restoreData();
 		pm.printProducts(p -> true, nameLengthAsc);
 		// ----------------------------------------------------------------------
 

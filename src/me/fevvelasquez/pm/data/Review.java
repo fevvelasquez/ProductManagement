@@ -15,14 +15,20 @@
  */
 package me.fevvelasquez.pm.data;
 
+import java.io.Serializable;
+
 /**
  * {@code Review} class represents product reviews. Each review is associated
  * with a rating and comments, in the Product Management System. <br>
  * 
- * @version 0.9.2. Implement Review Sort and Product Search Features.
+ * @version 0.13.3. Implement Memory Swap Mechanism.
  * @author oracle GNU GPL / fevvelasquez
  */
-public class Review implements Comparable<Review> {
+public class Review implements Comparable<Review>,Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2639642626165781877L;
 	private Rating rating;
 	private String comments;
 

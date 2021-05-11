@@ -24,6 +24,7 @@ import java.nio.file.StandardOpenOption;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -45,7 +46,7 @@ import java.util.stream.Collectors;
  * {@code Product Manager} class represents a factory which creates instances of
  * Product subclasses. <br>
  * 
- * @version 0.13.2. Bulk-Load Data from Files.
+ * @version 0.13.3. Implement Memory Swap Mechanism. TEST TEMP
  * @author oracle GNU GPL / fevvelasquez
  */
 public class ProductManager {
@@ -57,13 +58,9 @@ public class ProductManager {
 	static {
 		logger = Logger.getLogger(ProductManager.class.getName());
 
-		rformatters = Map.of(
-				"en-GB", new ResourceFormatter(Locale.UK), 
-				"en-US", new ResourceFormatter(Locale.US),
-				"fr-FR", new ResourceFormatter(Locale.FRANCE), 
-				"ru-RU", new ResourceFormatter(new Locale("ru", "RU")),
-				"zh-CN", new ResourceFormatter(Locale.CHINA), 
-				"es-MX", new ResourceFormatter(new Locale("es", "MX")));
+		rformatters = Map.of("en-GB", new ResourceFormatter(Locale.UK), "en-US", new ResourceFormatter(Locale.US),
+				"fr-FR", new ResourceFormatter(Locale.FRANCE), "ru-RU", new ResourceFormatter(new Locale("ru", "RU")),
+				"zh-CN", new ResourceFormatter(Locale.CHINA), "es-MX", new ResourceFormatter(new Locale("es", "MX")));
 	}
 	// ----------------------------------------------------------------------
 
@@ -74,10 +71,10 @@ public class ProductManager {
 	private ResourceBundle config;
 	private MessageFormat reviewFormat;
 	private MessageFormat productFormat;
-	
 
 	private Path reportsFolder;
 	private Path dataFolder;
+	private Path tempFolder;
 	// ----------------------------------------------------------------------
 	{
 		config = ResourceBundle.getBundle("me.fevvelasquez.pm.data.config");
@@ -86,6 +83,7 @@ public class ProductManager {
 
 		reportsFolder = Path.of(config.getString("reports.folder"));
 		dataFolder = Path.of(config.getString("data.folder"));
+		tempFolder = Path.of(config.getString("temp.folder"));
 	}
 	// ----------------------------------------------------------------------
 
@@ -93,16 +91,18 @@ public class ProductManager {
 	public ProductManager(Locale locale) {
 		this(locale.toLanguageTag());
 	}
+
 	public ProductManager(String languageTag) {
 		changeLocale(languageTag);
 		loadAllData();
 	}
 	// ----------------------------------------------------------------------
 
-	// 
+	//
 	public void changeLocale(String languageTag) {
 		rformatter = rformatters.getOrDefault(languageTag, rformatters.get("en-GB"));
 	}
+
 	public static Set<String> getSupportedLocales() {
 		return rformatters.keySet();
 	}
@@ -114,13 +114,14 @@ public class ProductManager {
 		products.putIfAbsent(product, new ArrayList<Review>());
 		return product;
 	}
+
 	public Product createProduct(int id, String name, BigDecimal price, Rating rating) {
 		Product product = new Drink(id, name, price, rating);
 		products.putIfAbsent(product, new ArrayList<Review>());
 		return product;
 	}
 	// ----------------------------------------------------------------------
-	
+
 	//
 	public Product reviewProduct(int id, Rating rating, String comments) {
 		try {
@@ -130,23 +131,20 @@ public class ProductManager {
 		}
 		return null;
 	}
+
 	public Product reviewProduct(Product product, Rating rating, String comments) {
 		List<Review> reviews = products.get(product);
 		products.remove(product, reviews);
 
 		reviews.add(new Review(rating, comments));
 		product = product.applyRating(
-				(int) Math.round(
-						reviews.stream()
-						.mapToInt(r -> r.getRating().ordinal())
-						.average()
-						.orElse(0)));
+				(int) Math.round(reviews.stream().mapToInt(r -> r.getRating().ordinal()).average().orElse(0)));
 
 		products.put(product, reviews);
 		return product;
 	}
 	// ----------------------------------------------------------------------
-	
+
 	//
 	private List<Review> loadReviews(Product product) {
 		List<Review> reviews = null;
@@ -157,10 +155,8 @@ public class ProductManager {
 			reviews = new ArrayList<>();
 		} else {
 			try {
-				reviews = Files.lines(file, Charset.forName("UTF-8"))
-						.map(line -> parseReview(line))
-						.filter(review -> review != null)
-						.collect(Collectors.toList());
+				reviews = Files.lines(file, Charset.forName("UTF-8")).map(line -> parseReview(line))
+						.filter(review -> review != null).collect(Collectors.toList());
 			} catch (IOException e) {
 				logger.warning("Error loading reviews with id:" + product.getId() + ". " + e.getMessage());
 			}
@@ -168,26 +164,59 @@ public class ProductManager {
 
 		return reviews;
 	}
+
 	private Product loadProduct(Path file) {
 		Product product = null;
 		try {
-			product = parseProduct(Files.lines(file, Charset.forName("UTF-8"))
-					.findFirst()
-					.orElseThrow());
+			product = parseProduct(Files.lines(file, Charset.forName("UTF-8")).findFirst().orElseThrow());
 		} catch (IOException e) {
 			logger.warning("Error loading product with path: \"" + file + "\". " + e.getMessage());
 		}
 		return product;
 	}
+
 	private void loadAllData() {
 		try {
-			products = Files.list(dataFolder)
-					.filter(file -> file.getFileName().toString().startsWith("product"))
+			products = Files.list(dataFolder).filter(file -> file.getFileName().toString().startsWith("product"))
 					.map(file -> loadProduct(file)).filter(product -> product != null)
 					.collect(Collectors.toMap(product -> product, product -> loadReviews(product)));
 		} catch (IOException e) {
 			logger.severe("Error loading All Data within path: \"" + dataFolder + "\". " + e.getMessage());
 		}
+	}
+	// ----------------------------------------------------------------------
+
+	// MEMORY SWAP MECHANISM
+	public void dumpData() {
+		try {
+			if (Files.notExists(tempFolder)) {
+				Files.createDirectory(tempFolder);
+			}
+			Path tempFile = tempFolder.resolve(MessageFormat.format(config.getString("temp.file"), Instant.now()));
+
+			try (ObjectOutputStream out = new ObjectOutputStream(
+					Files.newOutputStream(tempFile, StandardOpenOption.CREATE))) {
+				out.writeObject(products);
+				products = new HashMap<>();
+			}
+		} catch (IOException e) {
+			logger.severe("Error Dumping data " + e.getMessage());
+		}
+	}
+	@SuppressWarnings("unchecked")
+	public void restoreData() {
+		try {
+			Path tempFile = Files.list(tempFolder).filter(file -> file.getFileName().toString().endsWith("tmp"))
+					.findFirst().orElseThrow();
+			try (ObjectInputStream in = new ObjectInputStream(
+					Files.newInputStream(tempFile, StandardOpenOption.READ))) {
+				products = (Map<Product, List<Review>>) in.readObject();
+			}
+
+		} catch (Exception e) {
+			logger.severe("Error Restoring data " + e.getMessage());
+		}
+
 	}
 	// ----------------------------------------------------------------------
 
@@ -203,6 +232,7 @@ public class ProductManager {
 		}
 		return review;
 	}
+
 	private Product parseProduct(String text) {
 		Product product = null;
 		try {
@@ -229,7 +259,7 @@ public class ProductManager {
 		return product;
 	}
 	// ----------------------------------------------------------------------
-	
+
 	//
 	public void printProductReport(int id) {
 		try {
@@ -245,6 +275,7 @@ public class ProductManager {
 			e.printStackTrace();
 		}
 	}
+
 	public void printProductReport(Product product) throws UnsupportedEncodingException, IOException {
 		List<Review> reviews = products.get(product);
 		Path productFile = reportsFolder
@@ -264,7 +295,7 @@ public class ProductManager {
 		System.out.println("See: \"" + productFile + "\"");
 	}
 	// ----------------------------------------------------------------------
-	
+
 	//
 	public void printProducts(Predicate<Product> filter, Comparator<Product> sorter) {
 		StringBuilder mssg = new StringBuilder();
@@ -272,6 +303,7 @@ public class ProductManager {
 				.map(p -> rformatter.formatProduct(p) + "\n").collect(Collectors.joining()));
 		System.out.println(mssg);
 	}
+
 	public Product findProduct(int id) throws ProductManagerException {
 		return products.keySet().stream().filter(p -> p.getId() == id).findFirst()
 				.orElseThrow(() -> new ProductManagerException("Product id:" + id + ", not found."));

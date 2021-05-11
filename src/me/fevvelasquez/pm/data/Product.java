@@ -15,6 +15,7 @@
  */
 package me.fevvelasquez.pm.data;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -29,10 +30,15 @@ import static me.fevvelasquez.pm.data.Rating.*;
  * Each product can have a discount, calculated based on {@link DISCOUNT_RATE}
  * discount rate.
  * 
- * @version 0.9.2. Implement Review Sort and Product Search Features.
+ * @version 0.13.3. Implement Memory Swap Mechanism.
  * @author oracle GNU GPL / fevvelasquez
  */
-public abstract class Product implements Rateable<Product> {
+public abstract class Product implements Rateable<Product>, Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2639642626165781877L;
+
 	/**
 	 * A constant that defines a {@link java.math.BigDecimal BigDecimal} of the
 	 * discount rate value.<br>
