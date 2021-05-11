@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
  * {@code Product Manager} class represents a factory which creates instances of
  * Product subclasses. <br>
  * 
- * @version 0.13.3. Implement Memory Swap Mechanism. TEST TEMP
+ * @version 0.13.3. Implement Memory Swap Mechanism.
  * @author oracle GNU GPL / fevvelasquez
  */
 public class ProductManager {
@@ -187,7 +187,8 @@ public class ProductManager {
 	// ----------------------------------------------------------------------
 
 	// MEMORY SWAP MECHANISM
-	public void dumpData() {
+	@SuppressWarnings("unused")
+	private void dumpData() {
 		try {
 			if (Files.notExists(tempFolder)) {
 				Files.createDirectory(tempFolder);
@@ -203,13 +204,13 @@ public class ProductManager {
 			logger.severe("Error Dumping data " + e.getMessage());
 		}
 	}
-	@SuppressWarnings("unchecked")
-	public void restoreData() {
+	@SuppressWarnings({ "unchecked", "unused" })
+	private void restoreData() {
 		try {
 			Path tempFile = Files.list(tempFolder).filter(file -> file.getFileName().toString().endsWith("tmp"))
 					.findFirst().orElseThrow();
 			try (ObjectInputStream in = new ObjectInputStream(
-					Files.newInputStream(tempFile, StandardOpenOption.READ))) {
+					Files.newInputStream(tempFile, StandardOpenOption.DELETE_ON_CLOSE))) {
 				products = (Map<Product, List<Review>>) in.readObject();
 			}
 

@@ -25,7 +25,7 @@ import me.fevvelasquez.pm.data.Rating;
 /**
  * {@code Shop} class represents an application that manages Products.
  * 
- * @version 0.13.3. Implement Memory Swap Mechanism. TEST TEMP
+ * @version 0.13.3. Implement Memory Swap Mechanism.
  * @author oracle GNU GPL / fevvelasquez
  */
 public class Shop {
@@ -60,20 +60,10 @@ public class Shop {
 		// ----------------------------------------------------------------------
 
 		// STREAM EXAMPLES: =======================================================
-		System.out.println("\n=== Print Products:");
+		System.out.println("=== Print Products:");
 		// Comparator<Product> ratingAsc = (p1, p2) -> p1.getRating().ordinal() -
 		// p2.getRating().ordinal();
 		Comparator<Product> nameLengthAsc = (p1, p2) -> p1.getName().length() - p2.getName().length();
-		pm.printProducts(p -> true, nameLengthAsc);
-		// ----------------------------------------------------------------------
-
-		// TEST MEMORY SWAP
-		System.out.println("\n=== Print Products: dumbData()  MEMORY SWAP TEST");
-		pm.dumpData();
-		pm.printProducts(p -> true, nameLengthAsc);
-		// ----------------------------------------------------------------------
-		System.out.println("\n=== Print Products: restoreData() MEMORY SWAP TEST");
-		pm.restoreData();
 		pm.printProducts(p -> true, nameLengthAsc);
 		// ----------------------------------------------------------------------
 
