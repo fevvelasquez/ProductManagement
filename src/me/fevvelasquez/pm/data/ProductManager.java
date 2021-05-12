@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
  * {@code Product Manager} class represents a factory which creates instances of
  * Product subclasses. <br>
  * 
- * @version 0.13.3. Implement Memory Swap Mechanism.
+ * @version 0.14.1. Redesign Product Manager as a Singleton.
  * @author oracle GNU GPL / fevvelasquez
  */
 public class ProductManager {
@@ -54,6 +54,7 @@ public class ProductManager {
 	// STATIC CONTEXT
 	private static final Logger logger;
 	private static Map<String, ResourceFormatter> rformatters;
+	private static final ProductManager PM_INSTANCE;
 	// ----------------------------------------------------------------------
 	static {
 		logger = Logger.getLogger(ProductManager.class.getName());
@@ -61,12 +62,23 @@ public class ProductManager {
 		rformatters = Map.of("en-GB", new ResourceFormatter(Locale.UK), "en-US", new ResourceFormatter(Locale.US),
 				"fr-FR", new ResourceFormatter(Locale.FRANCE), "ru-RU", new ResourceFormatter(new Locale("ru", "RU")),
 				"zh-CN", new ResourceFormatter(Locale.CHINA), "es-MX", new ResourceFormatter(new Locale("es", "MX")));
+
+		PM_INSTANCE = new ProductManager();
+	}
+	// ----------------------------------------------------------------------
+
+	// STATIC METHODS
+	public static ProductManager getInstance() {
+		return PM_INSTANCE;
+	}
+
+	public static Set<String> getSupportedLocales() {
+		return rformatters.keySet();
 	}
 	// ----------------------------------------------------------------------
 
 	// INSTANCE CONTEXT
 	private Map<Product, List<Review>> products = new HashMap<>();
-	private ResourceFormatter rformatter;
 
 	private ResourceBundle config;
 	private MessageFormat reviewFormat;
@@ -88,23 +100,14 @@ public class ProductManager {
 	// ----------------------------------------------------------------------
 
 	// CONSTRUCTORS
-	public ProductManager(Locale locale) {
-		this(locale.toLanguageTag());
-	}
-
-	public ProductManager(String languageTag) {
-		changeLocale(languageTag);
+	private ProductManager() {
 		loadAllData();
 	}
 	// ----------------------------------------------------------------------
 
 	//
-	public void changeLocale(String languageTag) {
-		rformatter = rformatters.getOrDefault(languageTag, rformatters.get("en-GB"));
-	}
-
-	public static Set<String> getSupportedLocales() {
-		return rformatters.keySet();
+	public ResourceFormatter getLocale(String languageTag) {
+		return rformatters.getOrDefault(languageTag, rformatters.get("en-GB"));
 	}
 	// ----------------------------------------------------------------------
 
@@ -204,6 +207,7 @@ public class ProductManager {
 			logger.severe("Error Dumping data " + e.getMessage());
 		}
 	}
+
 	@SuppressWarnings({ "unchecked", "unused" })
 	private void restoreData() {
 		try {
@@ -262,9 +266,9 @@ public class ProductManager {
 	// ----------------------------------------------------------------------
 
 	//
-	public void printProductReport(int id) {
+	public void printProductReport(int id, String languageTag) {
 		try {
-			printProductReport(findProduct(id));
+			printProductReport(findProduct(id), languageTag);
 		} catch (ProductManagerException e) {
 			logger.log(Level.INFO, "Could not print Product Report with id:" + id + ". " + e.getMessage());
 		} catch (UnsupportedEncodingException e) {
@@ -277,7 +281,9 @@ public class ProductManager {
 		}
 	}
 
-	public void printProductReport(Product product) throws UnsupportedEncodingException, IOException {
+	public void printProductReport(Product product, String languageTag)
+			throws UnsupportedEncodingException, IOException {
+		ResourceFormatter rformatter = getLocale(languageTag);
 		List<Review> reviews = products.get(product);
 		Path productFile = reportsFolder
 				.resolve(MessageFormat.format(config.getString("report.file"), String.valueOf(product.getId())));
@@ -298,7 +304,8 @@ public class ProductManager {
 	// ----------------------------------------------------------------------
 
 	//
-	public void printProducts(Predicate<Product> filter, Comparator<Product> sorter) {
+	public void printProducts(Predicate<Product> filter, Comparator<Product> sorter, String languageTag) {
+		ResourceFormatter rformatter = getLocale(languageTag);
 		StringBuilder mssg = new StringBuilder();
 		mssg.append(products.keySet().stream().filter(filter).sorted(sorter)
 				.map(p -> rformatter.formatProduct(p) + "\n").collect(Collectors.joining()));
@@ -321,7 +328,8 @@ public class ProductManager {
 	 * @return a total of all discount values for each group of products that have
 	 *         the same rating.
 	 */
-	public Map<String, String> getDiscounts() {
+	public Map<String, String> getDiscounts(String languageTag) {
+		ResourceFormatter rformatter = getLocale(languageTag);
 		return products.keySet().stream()
 				.collect(Collectors.groupingBy(p -> p.getRating().getStars(),
 						Collectors.collectingAndThen(Collectors.summingDouble(p -> p.getDiscount().doubleValue()),

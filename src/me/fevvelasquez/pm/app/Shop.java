@@ -25,7 +25,7 @@ import me.fevvelasquez.pm.data.Rating;
 /**
  * {@code Shop} class represents an application that manages Products.
  * 
- * @version 0.13.3. Implement Memory Swap Mechanism.
+ * @version 0.14.1. Redesign Product Manager as a Singleton.
  * @author oracle GNU GPL / fevvelasquez
  */
 public class Shop {
@@ -35,7 +35,7 @@ public class Shop {
 	 */
 	public static void main(String[] args) {
 		// Create products factory using LOCALE
-		var pm = new ProductManager("en-GB");
+		var pm = ProductManager.getInstance();
 		// ----------------------------------------------------------------------
 
 		// From files:
@@ -64,7 +64,7 @@ public class Shop {
 		// Comparator<Product> ratingAsc = (p1, p2) -> p1.getRating().ordinal() -
 		// p2.getRating().ordinal();
 		Comparator<Product> nameLengthAsc = (p1, p2) -> p1.getName().length() - p2.getName().length();
-		pm.printProducts(p -> true, nameLengthAsc);
+		pm.printProducts(p -> true, nameLengthAsc,"en-GB");
 		// ----------------------------------------------------------------------
 
 	}
